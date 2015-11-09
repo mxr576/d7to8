@@ -13,7 +13,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\RouteMatch;
 
 /**
- * Checks access for displaying configuration translation page.
+ * Checks access for displaying user identity page.
  */
 class OwnDataAccessCheck implements AccessInterface {
 
