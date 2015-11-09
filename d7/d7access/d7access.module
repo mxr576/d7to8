@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Custom access control to a page.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function d7access_menu() {
+  $items = array();
+
+  $items['user/%user/identity'] = array(
+    'title' => 'Identity',
+    'description' => 'Identity Display',
+    'access callback' => 'd7access_identity_access',
+    'access arguments' => array(1),
+    'page callback' => 'd7access_identity_page',
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 30,
+  );
+
+  return $items;
+}
+
+/**
+ * Checks access for displaying user identity page.
+ */
+function d7access_identity_access($account) {
+  global $user;
+  return $user->uid == $account->uid;
+}
+
+/**
+ * Display a given user's identity.
+ *
+ * @param $account
+ *   The user to retrieve data on behalf of.
+ *
+ * @return array
+ *   Render array with all the results.
+ */
+function d7access_identity_page($account) {
+  return array(
+    'name' => array('#markup' => t('Name: %name', ['%name' => $account->name])),
+    'mail' => array('#markup' => t('Mail: %mail', ['%mail' => $account->mail])),
+  );
+}

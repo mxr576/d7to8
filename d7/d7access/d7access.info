@@ -1,0 +1,5 @@
+name = D7 Access Example
+description = Custom access control to a page
+package = D7to8
+version = 1.0-dev
+core = 7.x
