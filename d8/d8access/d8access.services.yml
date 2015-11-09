@@ -1,0 +1,6 @@
+services:
+  d8access.access_checker:
+    class: Drupal\d8access\Access\OwnDataAccessCheck
+    arguments: ['@current_user']
+    tags:
+    - { name: access_check, applies_to: _d8access_own_data_access_check }

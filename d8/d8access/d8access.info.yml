@@ -1,0 +1,6 @@
+name: D8 Access Example
+description: Custom access control to a page
+package: D7to8
+type: module
+version: 1.0-dev
+core: 8.x

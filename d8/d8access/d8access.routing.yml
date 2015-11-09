@@ -1,0 +1,7 @@
+d8access.display:
+  path: '/user/{user}/identity'
+  defaults:
+    _controller: '\Drupal\d8access\Controller\D8AccessDisplayController::Display'
+    _title: 'Identity Display'
+  requirements:
+    _d8access_own_data_access_check: 'TRUE'
