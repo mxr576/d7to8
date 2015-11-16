@@ -1,0 +1,8 @@
+name: D8: Batch demo
+type: module
+description: Batch API demonstration in Drupal 8.
+core: 8.x
+package: D7toD8
+dependencies:
+  - field
+  - node

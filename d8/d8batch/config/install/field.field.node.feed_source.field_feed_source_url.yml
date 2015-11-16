@@ -1,0 +1,23 @@
+uuid: f29b03e1-489b-40ea-9a47-719dee675d3b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_feed_source_url
+    - node.type.feed_source
+  module:
+    - link
+id: node.feed_source.field_feed_source_url
+field_name: field_feed_source_url
+entity_type: node
+bundle: feed_source
+label: URL
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 0
+field_type: link

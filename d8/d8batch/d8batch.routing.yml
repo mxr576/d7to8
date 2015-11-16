@@ -1,0 +1,7 @@
+d8batch.form:
+  path: 'import-feed-sources'
+  defaults:
+    _form: '\Drupal\d8batch\Form\D8BatchProcessForm'
+    _title: 'D8 Batch demo'
+  requirements:
+    _permission: 'administer site configuration'
