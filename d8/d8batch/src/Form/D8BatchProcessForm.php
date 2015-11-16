@@ -38,7 +38,7 @@ class D8BatchProcessForm extends FormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if (!fopen(drupal_get_path('module', 'd8batch') . '/' . self::CSVFILE_NAME, 'r')) {
