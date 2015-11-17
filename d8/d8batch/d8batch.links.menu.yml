@@ -1,0 +1,4 @@
+d8batch.import-feed-sources:
+  title: 'D8 Batch: Import feed sources'
+  route_name: d8batch.import-feed-sources
+  menu_name: main

@@ -7,6 +7,7 @@ dependencies:
     - node.type.feed_source
   module:
     - link
+    - d8batch
 id: node.feed_source.field_feed_source_url
 field_name: field_feed_source_url
 entity_type: node

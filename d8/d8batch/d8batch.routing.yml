@@ -1,4 +1,4 @@
-d8batch.form:
+d8batch.import-feed-sources:
   path: 'import-feed-sources'
   defaults:
     _form: '\Drupal\d8batch\Form\D8BatchProcessForm'

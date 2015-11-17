@@ -8,7 +8,6 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Drupal\node\Entity\Node;
-use GuzzleHttp\Client;
 use Drupal\Core\Url;
 
 /**
@@ -34,12 +33,18 @@ function d8batch_help($route_name, RouteMatchInterface $route_match) {
  *   Feed source URL.
  */
 function _d8batch_batch_operation($url, array $context) {
+  // Initialize variables in the first run.
+  if (empty($context['sandbox'])) {
+    $context['results']['success'] = [];
+    $context['results']['failed'] = [];
+    $context['sandbox']['client'] = new \GuzzleHttp\Client();
+  }
+
   try {
     $url = Url::fromUri($url);
-    if (!d8batch_check_if_feed_source_already_exists($url)) {
+    if (d8batch_check_if_feed_source_already_exists($url)) {
       try {
-        $client = new Client();
-        $response = $client->get($url->getUri());
+        $response = $context['sandbox']['client']->get($url->getUri());
         if ($response->getStatusCode() == 200) {
           // If title can not be extracted, then use the URL as title.
           if (!($title = _d8batch_get_title_of_feed_source($response->getBody()->getContents()))) {
