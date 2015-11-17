@@ -42,7 +42,7 @@ function _d8batch_batch_operation($url, array $context) {
 
   try {
     $url = Url::fromUri($url);
-    if (d8batch_check_if_feed_source_already_exists($url)) {
+    if (!d8batch_check_if_feed_source_already_exists($url)) {
       try {
         $response = $context['sandbox']['client']->get($url->getUri());
         if ($response->getStatusCode() == 200) {
