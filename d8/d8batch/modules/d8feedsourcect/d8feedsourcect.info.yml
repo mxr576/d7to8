@@ -1,0 +1,10 @@
+name: D8: Feed Source CT
+type: module
+description: Contains the definition of the Feed Source CT.
+core: 8.x
+package: D7to8
+dependencies:
+  - field
+  - link
+  - node
+  - path

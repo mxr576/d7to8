@@ -1,11 +1,12 @@
 langcode: en
 status: true
 dependencies:
-  module:
-    - d8batch
+  enforced:
+    module:
+      - d8feedsourcect
 name: 'Feed source'
 type: feed_source
-description: ''
+description: 'Store imported feed sources.'
 help: ''
 new_revision: false
 preview_mode: 1

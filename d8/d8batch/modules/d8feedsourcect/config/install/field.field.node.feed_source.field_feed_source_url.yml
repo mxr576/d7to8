@@ -6,7 +6,9 @@ dependencies:
     - node.type.feed_source
   module:
     - link
-    - d8batch
+  enforced:
+    module:
+      - d8feedsourcect
 id: node.feed_source.field_feed_source_url
 field_name: field_feed_source_url
 entity_type: node
