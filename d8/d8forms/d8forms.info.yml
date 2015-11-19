@@ -1,0 +1,5 @@
+name: D8: Forms
+type: module
+description: Form examples in D8.
+core: 8.x
+package: D7to8
