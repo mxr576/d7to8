@@ -18,7 +18,7 @@ The imported feed item links will be stored in a link field and the
 title of the generated nodes will be set to the feed source's original title
 with the help of the [Guzzle](http://docs.guzzlephp.org/en/latest/) and the
 [Crawler](http://symfony.com/doc/current/components/dom_crawler.html) libraries,
-which are also part of the Drupal 8 (thanks to the Symfony).
+which are also part of the Drupal 8 (thanks to Symfony).
 
 #### About these modules
 
@@ -56,7 +56,7 @@ Feed Source CT, when the module is uninstalled.
 
 **d8batch.module**
 
-Since the Batch API has not changed at all in the Drupal 8, the real value of
+Since Batch API has not changed at all in the Drupal 8, the real value of
 this module could be found elsewhere, for example in the
 `_d8batch_batch_operation()` function. This function contains the demonstration of
 how to use the new http client, called Guzzle in Drupal 8 for
