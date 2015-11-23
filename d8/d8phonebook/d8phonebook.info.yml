@@ -1,0 +1,6 @@
+name: D8 Phonebook
+description: An old-fashioned Drupal 8 phonebook
+package: D7to8
+type: module
+version: 1.0-dev
+core: 8.x

@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the D8 Phonebook module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function d8phonebook_schema() {
+  $schema['phonebook'] = array(
+    'description' => 'Stores phonebook entries.',
+    'fields' => array(
+      'pbid' => array(
+        'description' => 'Primary Key: unique ID for phonebook entry.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the creation of this entry.',
+      ),
+      'changed' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the last modification of this entry.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Name for this entry.',
+      ),
+      'phone' => array(
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Phone number for this entry.',
+      ),
+    ),
+    'indexes' => array(
+      'created' => array('created'),
+      'changed' => array('changed'),
+      'name' => array('name'),
+      'phone' => array('phone'),
+    ),
+    'primary key' => array('pbid'),
+  );
+  return $schema;
+}
