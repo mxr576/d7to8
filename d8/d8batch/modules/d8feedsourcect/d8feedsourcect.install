@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the D8: Feed Source CT module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ *
+ * All Feed Source nodes should be deleted, because the Feed source node
+ * type definition is deleted from the active configuration too.
+ */
+function d8feedsourcect_uninstall() {
+  $nids = \Drupal::entityQuery('node')
+    ->condition('type', 'feed_source')
+    ->execute();
+
+  if (!empty($nids)) {
+    $batch = [
+      'title' => t('Removing feed sources'),
+      'operations' => [
+        [
+          '_d8feedsourcect_delete_feed_source_node_batch_operation',
+          [$nids],
+        ],
+      ],
+      'progress_message' => '',
+      'error_message' => t('An error occurred during processing.'),
+      'finished' => '_d8feedsourcect_delete_feed_source_node_batch_finished',
+      'file' => drupal_get_path('module', 'd8feedsourcect') . '/d8feedsourcect.module',
+    ];
+    batch_set($batch);
+  }
+}

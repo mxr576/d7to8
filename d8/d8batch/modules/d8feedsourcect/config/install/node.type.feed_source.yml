@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - d8feedsourcect
+name: 'Feed source'
+type: feed_source
+description: 'Store imported feed sources.'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: false

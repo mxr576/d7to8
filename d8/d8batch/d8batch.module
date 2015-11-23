@@ -1,0 +1,168 @@
+<?php
+
+/**
+ * @file
+ * Contains d8batch.module.
+ */
+
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\DomCrawler\Crawler;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Url;
+use GuzzleHttp\Client;
+
+/**
+ * Implements hook_help().
+ */
+function d8batch_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the d8batch module.
+    case 'help.page.d8batch':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Batch API demonstration in Drupal 8.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * @param string $url
+ *   Feed source URL.
+ */
+function _d8batch_batch_operation($url, array $context) {
+  try {
+    $url = Url::fromUri($url);
+    if (!d8batch_check_if_feed_source_already_exists($url)) {
+      try {
+        $client = new Client();
+        $response = $client->get($url->getUri());
+        if ($response->getStatusCode() == 200) {
+          // If title can not be extracted, then use the URL as title.
+          if (!($title = _d8batch_get_title_of_feed_source($response->getBody()->getContents()))) {
+            $title = $url->getUri();
+          }
+          // Create a new node.
+          $node = Node::create([
+            'type' => 'feed_source',
+            'title' => $title,
+            'field_feed_source_url' => [
+              'uri' => $url->getUri(),
+            ],
+          ]);
+          try {
+            $node->save();
+            $context['results']['success'][] = $node;
+          }
+          catch (EntityStorageException $e) {
+            // Node can not be created.
+            watchdog_exception('d8batch', $e);
+            $context['results']['failed'][] = $url->getUri();
+          }
+        }
+        else {
+          // Wrong status code.
+          $context['results']['failed'][] = $url->getUri();
+        }
+      }
+      catch (Exception $e) {
+        // Feed source is unreachable on this url.
+        watchdog_exception('d8batch', $e);
+        $context['results']['failed'][] = $url->getUri();
+      }
+    }
+  }
+  catch (InvalidArgumentException $e) {
+    // Feed source url is not valid.
+    watchdog_exception('d8batch', $e);
+    $context['results']['failed'][] = $url->getUri();
+  }
+}
+
+/**
+ * Implements callback_batch_finished().
+ */
+function _d8batch_batch_finished($success, $results, $operations) {
+  if ($success) {
+    if (empty($results['success']) && empty($results['failed'])) {
+      drupal_set_message(t('All feed sources were successfully imported before!'));
+    }
+    else {
+      if (!empty($results['success'])) {
+        $message = \Drupal::translation()->formatPlural(count($results['success']), 'One feed source successfully imported.', '@count feed sources successfully imported.');
+        drupal_set_message($message);
+      }
+
+      if (!empty($results['failed'])) {
+        $list = [
+          '#theme' => 'item_list',
+          '#items' => $results['failed'],
+        ];
+        $message = \Drupal::translation()
+          ->formatPlural(count($results['failed']), 'One feed source can not be imported: @list', 'The following @count feed sources can not be imported: @list', [
+            '@list' => \Drupal::theme()
+              ->render('item_list', $list),
+          ]);
+        drupal_set_message($message, 'warning');
+      };
+    }
+  }
+  else {
+    drupal_set_message(t('Finished with an error, check the log fore more details!'), 'error');
+  }
+}
+
+/**
+ * Helper function which extracts the title of the feeds source.
+ *
+ * @param string $body
+ *   XML body of the feed source.
+ *
+ * @return bool|string
+ *   The title of the feed source, or FALSE.
+ */
+function _d8batch_get_title_of_feed_source($body) {
+  $crawler = new Crawler($body);
+  // Try to parse the body as a simple RSS feed.
+  $node_list = $crawler->filterXPath('//rss/channel/title');
+  if ($node_list->count()) {
+    return $node_list->text();
+  }
+  // Register additional namespaces for RDF feeds.
+  $crawler->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+  $crawler->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+  $crawler->registerNamespace('rss', 'http://purl.org/rss/1.0/');
+  $node_list = $crawler->filterXPath('//rdf:RDF/rss:channel/rss:title');
+  if ($node_list->count()) {
+    return $node_list->text();
+  }
+  // Register additional namespaces for ATOM feeds.
+  $crawler->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
+  $node_list = $crawler->filterXPath('//atom:feed/atom:title');
+  if ($node_list->count()) {
+    return $node_list->text();
+  }
+
+  return FALSE;
+}
+
+/**
+ * Helper function to determine whether a node exists with the given url or not.
+ *
+ * @param \Drupal\Core\Url $url
+ *   URL object.
+ *
+ * @return bool
+ *   TRUE if node exists, else FALSE.
+ */
+function d8batch_check_if_feed_source_already_exists(Url $url) {
+  $nids = \Drupal::entityQuery('node')
+    ->condition('field_feed_source_url', $url->getUri())
+    ->execute();
+
+  return !empty($nids);
+}

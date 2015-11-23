@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ * Contains d8forms.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\Entity\Node;
+
+define('D8FORMS_MODULE_NAME', 'd8forms');
+
+/**
+ * Implements hook_help().
+ */
+function d8forms_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the d8forms module.
+    case 'help.page.d8forms':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Form examples in D8.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add ability to node type delete forms to remove existing nodes with node
+ * types.
+ */
+function d8forms_form_node_type_delete_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $build_info = $form_state->getBuildInfo();
+  $form['remove_nodes'] = [
+    '#type' => 'submit',
+    '#access' => (bool) count(d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()
+      ->get('type'))),
+    '#value' => t('Remove all %node_type nodes', [
+      '%node_type' => $build_info['callback_object']->getEntity()->get('name'),
+    ]),
+    '#submit' => ['d8forms_form_node_type_delete_form_removes_nodes_submit'],
+  ];
+}
+
+/**
+ * Form submit handler for "Remove all %node_type nodes" button.
+ *
+ * @see d8forms_form_node_type_delete_form_alter()
+ */
+function d8forms_form_node_type_delete_form_removes_nodes_submit(&$form, FormStateInterface $form_state) {
+  $build_info = $form_state->getBuildInfo();
+  $nids = d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()->get('type'));
+
+  if (!empty($nids)) {
+    $batch = [
+      'title' => t('Removing all %node_type nodes', [
+        '%node_type' => $build_info['callback_object']->getEntity()->get('name'),
+      ]),
+      'operations' => [
+        [
+          '_d8forms_delete_all_node_type_nodes_batch_operation',
+          [$nids, $build_info['callback_object']->getEntity()->get('name')],
+        ],
+      ],
+      // Hide the original (miss-leading) progress message.
+      'progress_message' => '',
+      'error_message' => t('An error occurred during processing.'),
+      'finished' => '_d8forms_delete_all_node_type_nodes_batch_finished',
+      'file' => drupal_get_path('module', D8FORMS_MODULE_NAME) . '/' . D8FORMS_MODULE_NAME . '.module',
+    ];
+    batch_set($batch);
+  }
+}
+
+/**
+ * Get ID-s of nodes with the given node type.
+ *
+ * @param string $type
+ *   Type of node.
+ *
+ * @return array
+ *   Array of node ids.
+ */
+function d8forms_get_node_type_nodes($type) {
+  $nids = \Drupal::entityQuery('node')
+    ->condition('type', $type)
+    ->execute();
+  return $nids;
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * @param array $nids
+ *   Array of node ids.
+ */
+function _d8forms_delete_all_node_type_nodes_batch_operation(array $nids, $node_type, array $context) {
+  if (empty($context['sandbox'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = count($nids);
+    $context['sandbox']['nids'] = $nids;
+    $context['results']['errors'] = FALSE;
+    $context['results']['node_type'] = $node_type;
+  }
+
+  $current_nids = array_slice($context['sandbox']['nids'], $context['sandbox']['progress'], 10);
+
+  foreach ($current_nids as $nid) {
+    if ($node = Node::load($nid)) {
+      $context['message'] = t('Removing %node node...', ['%node' => $node->getTitle()]);
+      try {
+        $node->delete();
+      }
+      catch (EntityStorageException $e) {
+        $context['results']['errors'] = TRUE;
+        watchdog_exception(D8FORMS_MODULE_NAME, $e);
+      }
+    }
+    $context['sandbox']['progress']++;
+  };
+
+  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+/**
+ * Implements callback_batch_finished().
+ */
+function _d8forms_delete_all_node_type_nodes_batch_finished($success, $results, $operations) {
+  if ($success && !$results['error']) {
+    drupal_set_message(t('All %node_type nodes successfully deleted!', ['%node_type' => $results['node_type']]));
+  }
+  else {
+    drupal_set_message(t('%node type nodes deletion process finished with an error, check the log fore more details!', ['%node_type' => $results['node_type']]), 'error');
+  }
+}

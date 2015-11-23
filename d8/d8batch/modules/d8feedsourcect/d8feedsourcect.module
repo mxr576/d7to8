@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Module file for the D8: Feed Source CT.
+ */
+use Drupal\Core\Entity\EntityStorageException;
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * @param array $nids
+ *   Array of Feed Source node ids.
+ */
+function _d8feedsourcect_delete_feed_source_node_batch_operation(array $nids, array $context) {
+  if (empty($context['sandbox'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = count($nids);
+    $context['sandbox']['nids'] = $nids;
+    $context['results']['errors'] = FALSE;
+  }
+
+  $current_nids = array_slice($context['sandbox']['nids'], $context['sandbox']['progress'], 10);
+
+  foreach ($current_nids as $nid) {
+    if ($node = \Drupal\node\Entity\Node::load($nid)) {
+      $context['message'] = t('Removing %node feed source...', ['%node' => $node->getTitle()]);
+      try {
+        $node->delete();
+      }
+      catch (EntityStorageException $e) {
+        $context['results']['errors'] = TRUE;
+        watchdog_exception('d8feedsourcect', $e);
+      }
+    }
+    $context['sandbox']['progress']++;
+  };
+
+  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+/**
+ * Implements callback_batch_finished().
+ */
+function _d8feedsourcect_delete_feed_source_node_batch_finished($success, $results, $operations) {
+  if ($success && !$results['error']) {
+    drupal_set_message(t('All feed source nodes have been successfully deleted!'));
+  }
+  else {
+    drupal_set_message(t('Feed source nodes deletion process finished with an error, check the log fore more details!'), 'error');
+  }
+}
