@@ -20,10 +20,10 @@ content:
     label: inline
     settings:
       trim_length: 80
-      url_only: false
+      url_only: true
+      rel: nofollow
+      target: _blank
       url_plain: false
-      rel: ''
-      target: ''
     third_party_settings: {  }
   links:
     weight: 1

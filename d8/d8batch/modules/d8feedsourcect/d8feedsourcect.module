@@ -46,7 +46,7 @@ function _d8feedsourcect_delete_feed_source_node_batch_operation(array $nids, ar
  */
 function _d8feedsourcect_delete_feed_source_node_batch_finished($success, $results, $operations) {
   if ($success && !$results['error']) {
-    drupal_set_message(t('All feed source nodes successfully deleted!'));
+    drupal_set_message(t('All feed source nodes have been successfully deleted!'));
   }
   else {
     drupal_set_message(t('Feed source nodes deletion process finished with an error, check the log fore more details!'), 'error');

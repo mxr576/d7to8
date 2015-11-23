@@ -2,10 +2,12 @@
 
 /**
  * @file
- * Contains d8forms.module..
+ * Contains d8forms.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\Entity\Node;
 
 define('D8FORMS_MODULE_NAME', 'd8forms');
 
@@ -31,7 +33,7 @@ function d8forms_help($route_name, RouteMatchInterface $route_match) {
  * Add ability to node type delete forms to remove existing nodes with node
  * types.
  */
-function d8forms_form_node_type_delete_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function d8forms_form_node_type_delete_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $build_info = $form_state->getBuildInfo();
   $form['remove_nodes'] = [
     '#type' => 'submit',
@@ -49,10 +51,9 @@ function d8forms_form_node_type_delete_form_alter(&$form, \Drupal\Core\Form\Form
  *
  * @see d8forms_form_node_type_delete_form_alter()
  */
-function d8forms_form_node_type_delete_form_removes_nodes_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function d8forms_form_node_type_delete_form_removes_nodes_submit(&$form, FormStateInterface $form_state) {
   $build_info = $form_state->getBuildInfo();
-  $nids = d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()
-    ->get('type'));
+  $nids = d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()->get('type'));
 
   if (!empty($nids)) {
     $batch = [
@@ -65,6 +66,7 @@ function d8forms_form_node_type_delete_form_removes_nodes_submit(&$form, \Drupal
           [$nids, $build_info['callback_object']->getEntity()->get('name')],
         ],
       ],
+      // Hide the original (miss-leading) progress message.
       'progress_message' => '',
       'error_message' => t('An error occurred during processing.'),
       'finished' => '_d8forms_delete_all_node_type_nodes_batch_finished',
@@ -108,7 +110,7 @@ function _d8forms_delete_all_node_type_nodes_batch_operation(array $nids, $node_
   $current_nids = array_slice($context['sandbox']['nids'], $context['sandbox']['progress'], 10);
 
   foreach ($current_nids as $nid) {
-    if ($node = \Drupal\node\Entity\Node::load($nid)) {
+    if ($node = Node::load($nid)) {
       $context['message'] = t('Removing %node node...', ['%node' => $node->getTitle()]);
       try {
         $node->delete();

@@ -10,6 +10,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Url;
+use GuzzleHttp\Client;
 
 /**
  * Implements hook_help().
@@ -38,13 +39,11 @@ function _d8batch_batch_operation($url, array $context) {
     $url = Url::fromUri($url);
     if (!d8batch_check_if_feed_source_already_exists($url)) {
       try {
-        $client = new \GuzzleHttp\Client();
+        $client = new Client();
         $response = $client->get($url->getUri());
         if ($response->getStatusCode() == 200) {
           // If title can not be extracted, then use the URL as title.
-          if (!($title = _d8batch_get_title_of_feed_source($response->getBody()
-            ->getContents()))
-          ) {
+          if (!($title = _d8batch_get_title_of_feed_source($response->getBody()->getContents()))) {
             $title = $url->getUri();
           }
           // Create a new node.
@@ -78,7 +77,7 @@ function _d8batch_batch_operation($url, array $context) {
     }
   }
   catch (InvalidArgumentException $e) {
-    // Feed source url not valid.
+    // Feed source url is not valid.
     watchdog_exception('d8batch', $e);
     $context['results']['failed'][] = $url->getUri();
   }
@@ -90,12 +89,11 @@ function _d8batch_batch_operation($url, array $context) {
 function _d8batch_batch_finished($success, $results, $operations) {
   if ($success) {
     if (empty($results['success']) && empty($results['failed'])) {
-      drupal_set_message(t('All feed sources successfully imported before!'));
+      drupal_set_message(t('All feed sources were successfully imported before!'));
     }
     else {
       if (!empty($results['success'])) {
-        $message = \Drupal::translation()
-          ->formatPlural(count($results['success']), 'One feed source successfully imported.', '@count feed sources successfully imported.');
+        $message = \Drupal::translation()->formatPlural(count($results['success']), 'One feed source successfully imported.', '@count feed sources successfully imported.');
         drupal_set_message($message);
       }
 
