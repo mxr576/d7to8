@@ -18,7 +18,7 @@ The imported feed item links will be stored in a link field and the
 title of the generated nodes will be set to the feed source's original title
 with the help of the [Guzzle](http://docs.guzzlephp.org/en/latest/) and the
 [Crawler](http://symfony.com/doc/current/components/dom_crawler.html) libraries,
-which are also part of the Drupal 8 (thanks to Symfony).
+which are also part of Drupal 8 (thanks to Symfony).
 
 #### About these modules
 
