@@ -1,0 +1,33 @@
+d8phonebook.index:
+  path: '/phonebook'
+  defaults:
+    _controller: '\Drupal\d8phonebook\Controller\DefaultController::index'
+    _title: 'Phonebook'
+  requirements:
+    _permission: 'access content'
+
+d8phonebook.add:
+  path: '/phonebook/add'
+  defaults:
+    _form: '\Drupal\d8phonebook\Form\DefaultForm'
+    _title: 'Add entry'
+  requirements:
+    _permission: 'access content'
+
+d8phonebook.edit:
+  path: '/phonebook/{phonebook}/edit'
+  defaults:
+    _form: '\Drupal\d8phonebook\Form\DefaultForm'
+    _title: 'Edit entry'
+  requirements:
+    _permission: 'access content'
+
+d8phonebook.delete:
+  path: '/phonebook/{phonebook}/delete'
+  defaults:
+    _controller: '\Drupal\d8phonebook\Controller\DefaultController::delete'
+    _title: 'Delete entry'
+  requirements:
+    _permission: 'access content'
+    _csrf_token: 'TRUE'
+
