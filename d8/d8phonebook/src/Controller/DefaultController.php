@@ -102,6 +102,7 @@ class DefaultController extends ControllerBase {
     $output['table'] = [
       '#type' => 'table',
       '#header' => $header,
+      '#empty' => $this->t('No entries found.'),
     ];
     foreach ($result as $row) {
       $output['table'][] = [
@@ -113,18 +114,9 @@ class DefaultController extends ControllerBase {
         ['data' => ['#markup' => $this->l($this->t('delete'), new Url('d8phonebook.delete', ['phonebook' => $row->pbid], ['query' => ['token' => $this->csrf_token_generator->get('phonebook/' . $row->pbid . '/delete')]]))]],
       ];
     }
-    // If there is no row added to the table, replace the table with a message.
-    if (count($output['table']) == 2) {
-      $output['table'] = [
-        '#markup' => $this->t('No entries found.'),
-      ];
-    }
-    // Add a pager in other cases.
-    else {
-      $output['pager'] = array(
-        '#type' => 'pager',
-      );
-    }
+    $output['pager'] = array(
+      '#type' => 'pager',
+    );
     return $output;
   }
 
