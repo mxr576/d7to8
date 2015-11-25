@@ -51,10 +51,10 @@ class D8BatchProcessForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $batch = [
-      'title' => t('Importing feed sources'),
+      'title' => $this->t('Importing feed sources'),
       'operations' => [],
-      'progress_message' => t('Processed @current feed source from @total.'),
-      'error_message' => t('An error occurred during processing'),
+      'progress_message' => $this->t('Processed @current feed source from @total.'),
+      'error_message' => $this->t('An error occurred during processing'),
       'finished' => '_d8batch_batch_finished',
     ];
     // Get the feed sources from the CSV file and add them to the batch
