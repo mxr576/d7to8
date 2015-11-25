@@ -7,6 +7,7 @@
 
 namespace Drupal\d8phonebook\Form;
 
+use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,9 +22,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class DefaultForm extends FormBase {
 
   /**
-   * Drupal\Core\Database\Connection definition.
+   * \Drupal\Core\Database\Connection definition.
    *
-   * @var Drupal\Core\Database\Connection
+   * @var \Drupal\Core\Database\Connection
    */
   protected $connection;
 
@@ -81,7 +82,7 @@ class DefaultForm extends FormBase {
     ];
     $form['phone'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Name'),
+      '#title' => $this->t('Phone'),
       '#maxlength' => 64,
       '#default_value' => $pbid ? $entry->phone : '',
     ];
@@ -127,30 +128,28 @@ class DefaultForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $name = $form_state->getValue('name');
-    // @TODO: Check if we could use an upsert instead.
-    if ($pbid = $form_state->getValue('pbid')) {
-      $this->connection->update('phonebook')
+    try {
+      $name = $form_state->getValue('name');
+      $result = $this->connection->merge('phonebook')
+        ->key('pbid', $form_state->getValue('pbid'))
+        ->insertFields([
+          'created' => REQUEST_TIME,
+        ])
         ->fields([
           'changed' => REQUEST_TIME,
           'name' => $name,
           'phone' => $form_state->getValue('phone'),
-        ])
-        ->condition('pbid', $pbid)
-        ->execute();
-      drupal_set_message($this->t('Updated entry for %name.', ['%name' => $name]));
+        ])->execute();
+
+      if ($result === Merge::STATUS_INSERT) {
+        drupal_set_message($this->t('New entry added for %name.', ['%name' => $name]));
+      }
+      elseif ($result === Merge::STATUS_UPDATE) {
+        drupal_set_message($this->t('Updated entry for %name.', ['%name' => $name]));
+      }
     }
-    else {
-      $this->connection->insert('phonebook')
-        ->fields(['created', 'changed', 'name', 'phone'])
-        ->values([
-          'created' => REQUEST_TIME,
-          'changed' => REQUEST_TIME,
-          'name' => $name,
-          'phone' => $form_state->getValue('phone'),
-        ])
-        ->execute();
-      drupal_set_message($this->t('New entry added for %name.', ['%name' => $name]));
+    catch (\Exception $e) {
+      drupal_set_message($this->t('Something went wrong, please try again later!'), 'error');
     }
     $form_state->setRedirect('d8phonebook.index');
   }

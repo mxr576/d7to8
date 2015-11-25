@@ -27,21 +27,21 @@ class DefaultController extends ControllerBase {
   /**
    * Drupal\Core\Database\Connection definition.
    *
-   * @var Drupal\Core\Database\Connection
+   * @var \Drupal\Core\Database\Connection
    */
   protected $connection;
 
   /**
    * Drupal\Core\Datetime\DateFormatter definition.
    *
-   * @var Drupal\Core\Datetime\DateFormatter
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
   protected $date_formatter;
 
   /**
-   * Drupal\Core\Access\CsrfTokenGenerator definition.
+   * \Drupal\Core\Access\CsrfTokenGenerator definition.
    *
-   * @var Drupal\Core\Access\CsrfTokenGenerator
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
   protected $csrf_token_generator;
 
@@ -102,6 +102,7 @@ class DefaultController extends ControllerBase {
     $output['table'] = [
       '#type' => 'table',
       '#header' => $header,
+      '#empty' => $this->t('No entries found.'),
     ];
     foreach ($result as $row) {
       $output['table'][] = [
@@ -113,18 +114,9 @@ class DefaultController extends ControllerBase {
         ['data' => ['#markup' => $this->l($this->t('delete'), new Url('d8phonebook.delete', ['phonebook' => $row->pbid], ['query' => ['token' => $this->csrf_token_generator->get('phonebook/' . $row->pbid . '/delete')]]))]],
       ];
     }
-    // If there is no row added to the table, replace the table with a message.
-    if (count($output['table']) == 2) {
-      $output['table'] = [
-        '#markup' => $this->t('No entries found.'),
-      ];
-    }
-    // Add a pager in other cases.
-    else {
-      $output['pager'] = array(
-        '#type' => 'pager',
-      );
-    }
+    $output['pager'] = array(
+      '#type' => 'pager',
+    );
     return $output;
   }
 
