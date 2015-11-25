@@ -133,6 +133,7 @@ class DefaultForm extends FormBase {
       $result = $this->connection->merge('phonebook')
         ->key('pbid', $form_state->getValue('pbid'))
         ->fields([
+          'created' => REQUEST_TIME,
           'changed' => REQUEST_TIME,
           'name' => $name,
           'phone' => $form_state->getValue('phone'),
