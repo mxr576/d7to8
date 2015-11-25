@@ -37,8 +37,7 @@ function d8forms_form_node_type_delete_form_alter(&$form, FormStateInterface $fo
   $build_info = $form_state->getBuildInfo();
   $form['remove_nodes'] = [
     '#type' => 'submit',
-    '#access' => (bool) count(d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()
-      ->get('type'))),
+    '#access' => (bool) count(d8forms_get_node_type_nodes($build_info['callback_object']->getEntity()->get('type'))),
     '#value' => t('Remove all %node_type nodes', [
       '%node_type' => $build_info['callback_object']->getEntity()->get('name'),
     ]),

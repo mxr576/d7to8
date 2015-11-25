@@ -59,10 +59,10 @@ Feed Source CT, when the module is uninstalled.
 Since Batch API has not changed at all in the Drupal 8, the real value of
 this module could be found elsewhere, for example in the
 `_d8batch_batch_operation()` function. This function contains the demonstration of
-how to use the new http client, called Guzzle in Drupal 8 for
-doing GET requests. You can also see here an example for creating nodes
-programmatically in Drupal 8, where you do not need to write miles-long
-lines to set a field's value, like this: `$node->field_foo[LANGUAGE_NONE][0]['value']`.
+how to use [the new http client](https://www.drupal.org/node/1862446), called
+Guzzle in Drupal 8 for doing GET requests. You can also see here an example for
+creating nodes programmatically in Drupal 8, where you do not need to write
+miles-long lines to set a field's value, like this: `$node->field_foo[LANGUAGE_NONE][0]['value']`.
 In Drupal 8 this works the same as in Drupal 7 with [Entity Metadata Wrappers](https://www.drupal.org/node/1021556).
 Moreover, as the example demonstrates, you can set all field values in one place
 with `Node::create()`, when you create a new node.
