@@ -27,21 +27,21 @@ class DefaultController extends ControllerBase {
   /**
    * Drupal\Core\Database\Connection definition.
    *
-   * @var Drupal\Core\Database\Connection
+   * @var \Drupal\Core\Database\Connection
    */
   protected $connection;
 
   /**
    * Drupal\Core\Datetime\DateFormatter definition.
    *
-   * @var Drupal\Core\Datetime\DateFormatter
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
   protected $date_formatter;
 
   /**
-   * Drupal\Core\Access\CsrfTokenGenerator definition.
+   * \Drupal\Core\Access\CsrfTokenGenerator definition.
    *
-   * @var Drupal\Core\Access\CsrfTokenGenerator
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
   protected $csrf_token_generator;
 
