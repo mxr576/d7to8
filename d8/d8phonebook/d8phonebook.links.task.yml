@@ -1,0 +1,8 @@
+d8phonebook.index:
+  route_name: d8phonebook.index
+  base_route: d8phonebook.index
+  title: 'Entries'
+d8phonebook.add:
+  route_name: d8phonebook.add
+  base_route: d8phonebook.index
+  title: 'Add entry'
