@@ -7,7 +7,6 @@
 
 namespace Drupal\d8phonebook\Form;
 
-use Behat\Mink\Exception\Exception;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
